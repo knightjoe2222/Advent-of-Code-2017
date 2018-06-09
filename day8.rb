@@ -1,8 +1,23 @@
 require 'pp'
 
+# @r: stores registers. Key = register name. Value = register value
 @r = {}
+# @instructions: stores instructions.
+# =>  Key = instruction index (starting at 0)
+# =>  Value = hash containing key/value pairs for target, command, change & condition
 @instructions = {}
+
+# max stores solution for part 1
+max = 0
+
+# @highest_value stores solution for part 2
+@highest_value = 0
+
+# iterator
 i = 0
+
+# First we loop through each line, initializing key in registers hash
+# if not present, and adding that line of instruction to instructions hash
 open(ARGV.first) do |f|
   f.each_line do |line|
     l = line.split(' ')
@@ -18,6 +33,8 @@ open(ARGV.first) do |f|
   end
 end
 
+# Method used to determine if conditional is true or false
+# Uses a switch statement to handle all different kind of comparisons
 def check_condition(cond)
   condition = cond.split(' ')
   left = condition[0]
@@ -44,6 +61,8 @@ def check_condition(cond)
   return ans
 end
 
+# Loops through all instructions, determines if conditional is true or not
+# and changes value in registry.
 @instructions.each do |key, value|
   target = value['target']
   change = value['change'].to_i
@@ -59,12 +78,15 @@ end
   else
     puts "unhandled instruction."
   end
+  # after every registry is changed, check if it is larger than highest_value
+  @highest_value = @r[target] if @r[target] > @highest_value
 end
 
-max = 0
 
+# finds part 1 solution:
 @r.each do |key, value|
   max = value if value > max
 end
 
-puts max
+# Print solution to console
+puts "Max: #{max}","Highest Value: #{@highest_value}"

@@ -7,21 +7,19 @@
 stream = open(ARGV.first).read.strip.split('')
 # used to keep track of scope, stores opening '{' and '<'
 openstack = []
-# total score, used for part 1.
-score = 0
-# keeps track of current scope. Increments by 1 every time we open another group
-scope = 1
+# score: Solution for part 1.
+# scope: keeps track of current scope. Increments by 1 every time we open another group
+# char_count: Solution for part 2. Total non-canceled characters within the garbage
+score, scope, char_count = 0, 1, 0
+
 # flags to handle '!' and '<' behavior.
-skip = false
-garbage = false
-# Part 2's solution: total non-canceled characters within the garbage
-char_count = 0
+skip, garbage = false, false
 
 # Loop through stream
 stream.each do |c|
   # if the skip flag is true, set it back to false and skip the character immediately
   if skip
-    skip = false
+    skip = !skip
     next
   end
 
@@ -29,8 +27,8 @@ stream.each do |c|
   if c == '!'
     skip = true
     next
-
   end
+
   # if there is currently an open garbage, and the character
   # is not a closing garbage, we increment char_count and skip.
   if garbage && c != '>'
@@ -38,7 +36,7 @@ stream.each do |c|
     next
   end
 
-  # General switch statement for handling '{', '}', '<' and '>'
+  # General state machine for handling '{', '}', '<' and '>'
   case c
   when '{'
     openstack.push(c)
@@ -51,8 +49,8 @@ stream.each do |c|
     openstack.pop()
     garbage = false
   when '}'
-      openstack.pop()
-      scope -= 1
+    openstack.pop()
+    scope -= 1
   else
     next
   end
